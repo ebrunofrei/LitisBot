@@ -1,0 +1,17 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^x.x.x",
+    "dotenv": "^x.x.x",
+    "express": "^x.x.x",
+    "express-rate-limit": "^x.x.x",
+    "firebase-admin": "^13.4.0",
+    "mongoose": "^x.x.x",
+    "openai": "^x.x.x"
+  }
+}
