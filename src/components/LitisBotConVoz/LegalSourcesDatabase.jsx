@@ -1,3 +1,4 @@
+// src/components/LitisBotConVoz/LegalSourcesDatabase.jsx
 import React from 'react';
 
 const LegalSourcesDatabase = () => {

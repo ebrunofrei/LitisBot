@@ -1,5 +1,5 @@
-// src/components/LitisBotConVoz/LegalSourcesDatabase.js
-import { db } from '../../firebase';
+// src/database/legalSourceService.js
+import { db } from '../firebase';
 import { collection, doc, setDoc, updateDoc, increment } from 'firebase/firestore';
 
 /**
@@ -34,12 +34,13 @@ export const incrementarCitaFuente = async (cita) => {
   if (!cita) return;
 
   const ref = doc(collection(db, 'fuentesLegales'), cita);
+
   try {
     await updateDoc(ref, {
       citada: increment(1),
       ultimaActualizacion: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error al actualizar la fuente legal:', error);
+    console.error('Error al incrementar la cita de la fuente:', error);
   }
 };

@@ -11,7 +11,7 @@ import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
 import { useLanguageDetection } from '../hooks/useLanguageDetection';
 
 import { handleLegalResponse } from '../components/LitisBotConVoz/LegalResponseEngine';
-import { saveLegalSource } from '../components/LitisBotConVoz/LegalSourcesDatabase';
+import { saveLegalSource } from '../database/legalSourceService';
 import { db } from '../firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
