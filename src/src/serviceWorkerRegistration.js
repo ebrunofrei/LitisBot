@@ -1,7 +1,6 @@
 // src/serviceWorkerRegistration.js
 
-// Este archivo registra un service worker para hacer la app instalable (PWA)
-// Compatible con Create React App
+// Este archivo registra el service worker para que la app sea una PWA.
 
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
@@ -14,7 +13,7 @@ const isLocalhost = Boolean(
 );
 
 export function register(config) {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     // La URL pública del service worker
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
@@ -30,7 +29,7 @@ export function register(config) {
         checkValidServiceWorker(swUrl, config);
 
         navigator.serviceWorker.ready.then(() => {
-          console.log('Este app web está siendo servido en caché por un SW.');
+          console.log('Este app web está siendo servida en caché por un SW.');
         });
       } else {
         // Registra el service worker para producción

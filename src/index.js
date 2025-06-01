@@ -2,9 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import * as serviceWorkerRegistration from './serviceWorkerRegistration'; // Asegúrate que este archivo existe en src
 import reportWebVitals from './reportWebVitals';
-// Importa el service worker
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -14,8 +13,8 @@ root.render(
   </React.StrictMode>
 );
 
-reportWebVitals();
-
-// Activa el service worker para habilitar PWA
+// Aquí registramos el service worker para PWA
 serviceWorkerRegistration.register();
+
+reportWebVitals();
 
