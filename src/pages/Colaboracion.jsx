@@ -4,7 +4,7 @@ import React from 'react';
 const Colaboracion = () => {
   return (
     <div style={{ padding: 20 }}>
-      <h1>Colabora con Litigator</h1>
+      <h1>Colabora con LitisBot</h1>
       <p>Gracias por apoyar nuestro proyecto para seguir creciendo y mejorando.</p>
       <p>Colabora enviando tu aporte a:</p>
       <ul>

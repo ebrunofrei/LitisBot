@@ -6,7 +6,7 @@ const path = require('path');
 const serviceAccount = require(path.join(__dirname, '../credenciales/serviceAccountKey.json'));
 
 // CAMBIA por tu bucket real de Firebase (coincide con tu ID de proyecto)
-const storageBucket = 'litigator-5628c.appspot.com';
+const storageBucket = 'LitisBot-5628c.appspot.com';
 
 if (!admin.apps.length) {
   admin.initializeApp({

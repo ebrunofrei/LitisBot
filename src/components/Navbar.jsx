@@ -40,7 +40,7 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-header">
-        <Link to="/" className="navbar-brand" onClick={closeMenu}>Litigator</Link>
+        <Link to="/" className="navbar-brand" onClick={closeMenu}>LitisBot</Link>
         <span className="menu-toggle" onClick={toggleMenu}>&#9776;</span>
       </div>
 
@@ -55,7 +55,7 @@ const Navbar = () => {
         <Link to="/jurisprudencia" onClick={closeMenu}>Jurisprudencia</Link>
         <Link to="/tips" onClick={closeMenu}>Tips</Link>
         <Link to="/buscador" onClick={closeMenu}>Buscador Google</Link>
-        <Link to="/colaboracion" onClick={closeMenu}>Colabora con Litigator</Link>
+        <Link to="/colaboracion" onClick={closeMenu}>Colabora con LitisBot</Link>
         {!user && <Link to="/login" onClick={closeMenu}>Iniciar Sesión</Link>}
         {!user && <Link to="/register" onClick={closeMenu}>Registrarse</Link>}
         {!user && <Link to="/forgot-password" onClick={closeMenu}>¿Olvidaste tu contraseña?</Link>}
