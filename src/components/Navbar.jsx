@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
@@ -40,7 +39,26 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-header">
-        <Link to="/" className="navbar-brand" onClick={closeMenu}>LitisBot</Link>
+        <Link
+          to="/"
+          className="navbar-brand"
+          onClick={closeMenu}
+          style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+        >
+          <img
+            src="/litisbot-logo.png"
+            alt="LitisBot"
+            style={{
+              height: '38px',
+              marginRight: '10px',
+              verticalAlign: 'middle',
+              borderRadius: '8px',
+              background: '#fff',
+              padding: '2px'
+            }}
+          />
+          <span style={{ color: "#fff", fontWeight: "bold", fontSize: "1.5em" }}>LitisBot</span>
+        </Link>
         <span className="menu-toggle" onClick={toggleMenu}>&#9776;</span>
       </div>
 
