@@ -19,7 +19,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 
-// Agrega más imports según crees nuevas páginas
+
 
 function App() {
   return (
