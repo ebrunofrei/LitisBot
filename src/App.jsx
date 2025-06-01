@@ -4,20 +4,19 @@ import Navbar from "./components/Navbar";
 import InstalarApp from "./components/InstalarApp";
 
 // Importa aquí tus páginas
-import Bienvenida from "./pages/Bienvenida";
-import LitisBotConVoz from "./components/LitisBotConVoz";
-import LitisBotOCR from "./pages/LitisBotOCR";
-import BusquedaAvanzada from "./pages/BusquedaAvanzada";
-import Agenda from "./pages/Agenda";
-import Clientes from "./pages/Clientes";
-import Biblioteca from "./pages/Biblioteca";
-import Jurisprudencia from "./pages/Jurisprudencia";
-import Tips from "./pages/Tips";
-import BuscadorGoogle from "./pages/BuscadorGoogle";
-import Colaboracion from "./pages/Colaboracion";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
+import LitisBotOCR from './pages/LitisBotOCR';
+import Bienvenida from './pages/Bienvenida';
+import Agenda from './pages/Agenda';
+import Biblioteca from './pages/Biblioteca';
+import Clientes from './pages/Clientes';
+import Jurisprudencia from './pages/Jurisprudencia';
+import Tips from './pages/Tips';
+import BuscadorGoogle from './pages/BuscadorGoogle';
+import Colaboracion from './pages/Colaboracion';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import LitisBotConVoz from './pages/LitisBotConVoz';
 
 // Puedes agregar aquí más páginas según tu estructura...
 
