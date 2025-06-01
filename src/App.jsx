@@ -3,34 +3,35 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import InstalarApp from "./components/InstalarApp";
 
-// Importa aquí tus páginas
-import LitisBotOCR from './pages/LitisBotOCR';
-import Bienvenida from './pages/Bienvenida';
-import Agenda from './pages/Agenda';
-import Biblioteca from './pages/Biblioteca';
-import Clientes from './pages/Clientes';
-import Jurisprudencia from './pages/Jurisprudencia';
-import Tips from './pages/Tips';
-import BuscadorGoogle from './pages/BuscadorGoogle';
-import Colaboracion from './pages/Colaboracion';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import LitisBotConVoz from './pages/LitisBotConVoz';
+// Importa tus páginas desde /pages/
+import Bienvenida from "./pages/Bienvenida";
+import LitisBotConVoz from "./pages/LitisBotConVoz";
+import LitisBotOCR from "./pages/LitisBotOCR";
+import BusquedaAvanzada from "./pages/BusquedaAvanzada";
+import Agenda from "./pages/Agenda";
+import Clientes from "./pages/Clientes";
+import Biblioteca from "./pages/Biblioteca";
+import Jurisprudencia from "./pages/Jurisprudencia";
+import Tips from "./pages/Tips";
+import BuscadorGoogle from "./pages/BuscadorGoogle";
+import Colaboracion from "./pages/Colaboracion";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 
-// Puedes agregar aquí más páginas según tu estructura...
+// Agrega más imports según crees nuevas páginas
 
 function App() {
   return (
     <Router>
       <div>
-        {/* Navbar principal */}
+        {/* Navbar superior */}
         <Navbar />
 
-        {/* Banner PWA InstalarApp */}
+        {/* Banner de instalación PWA */}
         <InstalarApp />
 
-        {/* Contenido principal de rutas */}
+        {/* Rutas principales */}
         <div className="main-content" style={{ padding: "2rem 1rem" }}>
           <Routes>
             <Route path="/" element={<Bienvenida />} />
@@ -47,8 +48,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            {/* Agrega aquí más rutas si tienes nuevas páginas */}
-            {/* <Route path="/otra-pagina" element={<OtraPagina />} /> */}
+            {/* Puedes agregar aquí más rutas si creas nuevas páginas */}
           </Routes>
         </div>
       </div>
