@@ -6,7 +6,7 @@ import InstalarApp from "./components/InstalarApp";
 // Importa aquí tus páginas
 import Bienvenida from "./pages/Bienvenida";
 import LitisBotConVoz from "./components/LitisBotConVoz";
-import LitisBotOCR from "./components/LitisBotOCR";
+import LitisBotOCR from "./pages/LitisBotOCR";
 import BusquedaAvanzada from "./pages/BusquedaAvanzada";
 import Agenda from "./pages/Agenda";
 import Clientes from "./pages/Clientes";
