@@ -1,23 +1,20 @@
 // src/serviceWorkerRegistration.js
 
-// Este archivo registra el service worker para que la app sea una PWA.
-
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
-    // [::1] es la dirección IPv6 de localhost
-    window.location.hostname === '[::1]' ||
-    // 127.0.0.1/8 es considerado localhost para IPv4
-    window.location.hostname.match(
-      /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
-    )
+  window.location.hostname === '[::1]' ||
+  // 127.0.0.1/8
+  window.location.hostname.match(
+    /^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/
+  )
 );
 
 export function register(config) {
   if ('serviceWorker' in navigator) {
-    // La URL pública del service worker
+    // Solo en producción, pero si quieres probar local quita el comentario siguiente:
+    // if (process.env.NODE_ENV === 'production') {
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
-      // Si PUBLIC_URL está en otro origen, no registra el SW
       return;
     }
 
@@ -25,17 +22,19 @@ export function register(config) {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 
       if (isLocalhost) {
-        // Si es localhost, valida el service worker
+        // Esto es para localhost
         checkValidServiceWorker(swUrl, config);
-
         navigator.serviceWorker.ready.then(() => {
-          console.log('Este app web está siendo servida en caché por un SW.');
+          console.log(
+            'Esta app está siendo servida en caché por un service worker (localhost).'
+          );
         });
       } else {
-        // Registra el service worker para producción
+        // Para producción
         registerValidSW(swUrl, config);
       }
     });
+    // }
   }
 }
 
@@ -52,16 +51,13 @@ function registerValidSW(swUrl, config) {
           if (installingWorker.state === 'installed') {
             if (navigator.serviceWorker.controller) {
               // Nuevo contenido disponible
-              console.log('Nuevo contenido está disponible; por favor recarga la página.');
-
-              // Ejecuta el callback si existe
+              console.log('Nuevo contenido está disponible y será usado cuando todas las pestañas se cierren.');
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
             } else {
-              // El contenido está cacheado para uso offline
-              console.log('El contenido está cacheado para uso offline.');
-
+              // Contenido cacheado para offline
+              console.log('Contenido está cacheado para uso offline.');
               if (config && config.onSuccess) {
                 config.onSuccess(registration);
               }
@@ -76,30 +72,28 @@ function registerValidSW(swUrl, config) {
 }
 
 function checkValidServiceWorker(swUrl, config) {
-  // Verifica si el SW existe, sino, recarga la página.
   fetch(swUrl, {
-    headers: { 'Service-Worker': 'script' },
+    headers: { 'Service-Worker': 'script' }
   })
     .then(response => {
-      // SW encontrado, lo registra
       const contentType = response.headers.get('content-type');
       if (
         response.status === 404 ||
         (contentType != null && contentType.indexOf('javascript') === -1)
       ) {
-        // No encontrado o no es JS, recarga
+        // No hay service worker, recarga y elimina el anterior
         navigator.serviceWorker.ready.then(registration => {
           registration.unregister().then(() => {
             window.location.reload();
           });
         });
       } else {
-        // SW válido, lo registra normalmente
+        // Hay un service worker válido
         registerValidSW(swUrl, config);
       }
     })
     .catch(() => {
-      console.log('No hay conexión a internet. La app está offline.');
+      console.log('No hay conexión a internet. App en modo offline.');
     });
 }
 

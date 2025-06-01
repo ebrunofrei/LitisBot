@@ -1,5 +1,3 @@
-// public/service-worker.js
-
 const CACHE_NAME = "litisbot-cache-v1";
 const urlsToCache = [
   "/",
@@ -11,8 +9,9 @@ const urlsToCache = [
   "/logo512.png"
 ];
 
-// Install service worker and cache resources
+// Instala el service worker y cachea recursos
 self.addEventListener("install", event => {
+  console.log('Service Worker instalado');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
@@ -20,7 +19,7 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-// Activate service worker and clean old caches
+// Activa el service worker y limpia cachés antiguas
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -34,12 +33,20 @@ self.addEventListener("activate", event => {
     })
   );
   self.clients.claim();
+  console.log('Service Worker activo');
 });
 
-// Fetch resources
+// Responde con recursos cacheados o red
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request)
-      .then(response => response || fetch(event.request))
+      .then(response => {
+        // Devuelve desde caché, o pide a la red si no está cacheado
+        return response || fetch(event.request);
+      })
+      .catch(() => {
+        // Si no hay red ni cache, podrías retornar una página offline aquí
+        // return caches.match('/offline.html');
+      })
   );
 });
