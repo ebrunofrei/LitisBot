@@ -1,59 +1,59 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import InstalarApp from "./components/InstalarApp";
 
-import { AuthProvider } from './context/AuthContext';
-import Navbar from './components/Navbar';
+// Importa aquí tus páginas
+import Bienvenida from "./pages/Bienvenida";
+import LitisBotConVoz from "./components/LitisBotConVoz";
+import LitisBotOCR from "./components/LitisBotOCR";
+import BusquedaAvanzada from "./pages/BusquedaAvanzada";
+import Agenda from "./pages/Agenda";
+import Clientes from "./pages/Clientes";
+import Biblioteca from "./pages/Biblioteca";
+import Jurisprudencia from "./pages/Jurisprudencia";
+import Tips from "./pages/Tips";
+import BuscadorGoogle from "./pages/BuscadorGoogle";
+import Colaboracion from "./pages/Colaboracion";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
 
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Clientes from './pages/Clientes';
-import LitisBotConVoz from './pages/LitisBotConVoz';
-import LitisBotOCR from './pages/LitisBotOCR';
-import BusquedaAvanzada from './pages/BusquedaAvanzada';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import Colaboracion from './pages/Colaboracion';
-import BuscadorGoogle from './pages/BuscadorGoogle';
-import Biblioteca from './pages/Biblioteca';
-import Jurisprudencia from './pages/Jurisprudencia';
-import Tips from './pages/Tips';
-import Agenda from './pages/Agenda';
-
-import PrivateRoute from './components/PrivateRoute';
+// Puedes agregar aquí más páginas según tu estructura...
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <div>
+        {/* Navbar principal */}
         <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-          <Route path="/clientes" element={<PrivateRoute><Clientes /></PrivateRoute>} />
-          <Route path="/litisbotconvoz" element={<LitisBotConVoz />} />
-          <Route path="/litisbotorc" element={<LitisBotOCR />} />
-          <Route path="/busqueda-avanzada" element={<BusquedaAvanzada />} />
-          <Route path="/agenda" element={<PrivateRoute><Agenda /></PrivateRoute>} />
-          <Route path="/biblioteca" element={<Biblioteca />} />
-          <Route path="/jurisprudencia" element={<Jurisprudencia />} />
-          <Route path="/tips" element={<Tips />} />
-          <Route path="/buscador" element={<BuscadorGoogle />} />
-          <Route path="/colaboracion" element={<Colaboracion />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route
-            path="*"
-            element={
-              <div style={{ padding: 20 }}>
-                <h1>404 - Página no encontrada</h1>
-              </div>
-            }
-          />
-        </Routes>
-      </Router>
-    </AuthProvider>
+
+        {/* Banner PWA InstalarApp */}
+        <InstalarApp />
+
+        {/* Contenido principal de rutas */}
+        <div className="main-content" style={{ padding: "2rem 1rem" }}>
+          <Routes>
+            <Route path="/" element={<Bienvenida />} />
+            <Route path="/litisbotconvoz" element={<LitisBotConVoz />} />
+            <Route path="/litisbotorc" element={<LitisBotOCR />} />
+            <Route path="/busqueda-avanzada" element={<BusquedaAvanzada />} />
+            <Route path="/agenda" element={<Agenda />} />
+            <Route path="/clientes" element={<Clientes />} />
+            <Route path="/biblioteca" element={<Biblioteca />} />
+            <Route path="/jurisprudencia" element={<Jurisprudencia />} />
+            <Route path="/tips" element={<Tips />} />
+            <Route path="/buscador" element={<BuscadorGoogle />} />
+            <Route path="/colaboracion" element={<Colaboracion />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            {/* Agrega aquí más rutas si tienes nuevas páginas */}
+            {/* <Route path="/otra-pagina" element={<OtraPagina />} /> */}
+          </Routes>
+        </div>
+      </div>
+    </Router>
   );
 }
 
