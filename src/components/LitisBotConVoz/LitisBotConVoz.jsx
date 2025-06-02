@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { db, auth } from "../../utils/firebase";
+import { db, auth } from "../../firebase"; // Asegúrate que esta ruta es correcta
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -110,7 +110,7 @@ const LitisBotConVoz = () => {
 
     if (archivo) {
       setCargandoArchivo(true);
-      // Procesamiento de archivo (próximamente)
+      // Procesamiento futuro del archivo
       setCargandoArchivo(false);
     }
 
@@ -142,7 +142,14 @@ const LitisBotConVoz = () => {
 
   return (
     <div className="litisbotvoz-container" style={{ maxWidth: 520, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ color: "#1662C4", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <h2 style={{
+        color: "#1662C4",
+        textAlign: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8
+      }}>
         <span role="img" aria-label="chat">💬</span> Litis Chat
       </h2>
 
