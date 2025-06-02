@@ -3,6 +3,7 @@ import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
+// Compatibilidad voz
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 const synth = window.speechSynthesis;
@@ -14,7 +15,7 @@ const estados = {
   RESPONDIENDO: "¡Aquí tienes la respuesta!"
 };
 
-// Base de conceptos y respuestas reales
+// Conceptos base
 const conceptosBase = {
   "derecho administrativo": "El Derecho Administrativo es la rama del Derecho Público que regula la organización, el funcionamiento y la actividad de la Administración Pública, así como las relaciones entre esta y los ciudadanos.",
   "derecho civil": "El Derecho Civil es la rama del Derecho que regula las relaciones privadas entre las personas, tales como contratos, familia, propiedad y sucesiones.",
@@ -23,7 +24,7 @@ const conceptosBase = {
 };
 
 function obtenerConcepto(pregunta) {
-  const texto = pregunta.toLowerCase();
+  const texto = pregunta ? pregunta.toLowerCase() : "";
   for (let clave in conceptosBase) {
     if (texto.includes(clave)) {
       return conceptosBase[clave];
@@ -31,6 +32,30 @@ function obtenerConcepto(pregunta) {
   }
   return null;
 }
+
+// ----------------- FUNCIÓN CONEXIÓN IA REAL ------------------
+const obtenerRespuestaIA = async (pregunta, archivo = null) => {
+  const concepto = obtenerConcepto(pregunta);
+  if (concepto) return concepto;
+
+  if (archivo) {
+    return "La función de análisis de archivos estará disponible pronto.";
+  }
+
+  try {
+    const response = await fetch('https://litisbot-backend.onrender.com/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: pregunta })
+    });
+    if (!response.ok) throw new Error('Error en la conexión con la IA');
+    const data = await response.json();
+    return data.response || "No se obtuvo respuesta de la IA.";
+  } catch (error) {
+    return "Ocurrió un error consultando a la IA: " + error.message;
+  }
+};
+// -------------------------------------------------------------
 
 const LitisBotConVoz = () => {
   const [user] = useAuthState(auth);
@@ -40,17 +65,15 @@ const LitisBotConVoz = () => {
   const [estado, setEstado] = useState(estados.INICIO);
   const [archivo, setArchivo] = useState(null);
   const [cargandoArchivo, setCargandoArchivo] = useState(false);
-
   const [microfonoActivo, setMicrofonoActivo] = useState(true);
   const [vozActiva, setVozActiva] = useState(true);
 
   const inputRef = useRef(null);
 
-  // Activar/desactivar microfono y voz
   const toggleMicrofono = () => setMicrofonoActivo((v) => !v);
   const toggleVoz = () => setVozActiva((v) => !v);
 
-  // --- Reconocimiento de voz
+  // Reconocimiento de voz
   const handleEscuchar = () => {
     if (!recognition) {
       alert("El reconocimiento de voz no está disponible en este navegador.");
@@ -75,7 +98,7 @@ const LitisBotConVoz = () => {
     recognition.onend = () => setEscuchando(false);
   };
 
-  // --- Voz (Text-to-Speech)
+  // Voz (Text-to-Speech)
   const handleHablar = (texto) => {
     if (vozActiva && "speechSynthesis" in window) {
       const utter = new window.SpeechSynthesisUtterance(texto);
@@ -85,26 +108,7 @@ const LitisBotConVoz = () => {
     }
   };
 
-  // --- Respuesta mejorada
-  const obtenerRespuestaIA = async (pregunta, archivo = null) => {
-    // 1. Buscar concepto jurídico conocido
-    const concepto = obtenerConcepto(pregunta);
-    if (concepto) return concepto;
-
-    // 2. Resto de respuestas
-    if (archivo && pregunta.toLowerCase().includes("resumir")) {
-      return `Analicé el archivo y aquí tienes un resumen simulado. [Función real pendiente de backend]`;
-    }
-    if (pregunta.toLowerCase().includes("consejo")) {
-      return `Consejo jurídico: Ante cualquier duda, revisa la normativa nacional vigente y consulta con un abogado colegiado.`;
-    }
-    if (pregunta.toLowerCase().includes("buscar")) {
-      return `Funcionalidad de búsqueda avanzada disponible. Pronto se integrará consulta a la biblioteca legal y Google.`;
-    }
-    return `Lo siento, mi base de conocimientos aún está en desarrollo para consultas muy específicas. ¿Deseas que busque información adicional o deseas consultar otro tema?`;
-  };
-
-  // --- Enviar consulta
+  // Enviar consulta
   const handleEnviar = async (texto = null) => {
     let pregunta = texto !== null ? texto : input;
     if (!pregunta && !archivo) {
@@ -117,16 +121,16 @@ const LitisBotConVoz = () => {
     // Procesar adjunto
     if (archivo) {
       setCargandoArchivo(true);
-      // Aquí iría la lógica real de análisis de archivo
+      // Aquí iría la lógica real de análisis de archivo en el futuro
       setCargandoArchivo(false);
     }
 
-    // Respuesta avanzada
+    // Llama a la IA real (backend)
     const respuestaBot = await obtenerRespuestaIA(pregunta, archivo);
     setRespuesta(respuestaBot);
     setEstado(estados.RESPONDIENDO);
 
-    // Guardar en Firebase (historial aprendizaje bot)
+    // Guardar en Firebase
     if (user) {
       await addDoc(collection(db, "conversaciones"), {
         pregunta,
@@ -143,7 +147,7 @@ const LitisBotConVoz = () => {
     setInput("");
   };
 
-  // --- Adjuntar archivo
+  // Adjuntar archivo
   const handleArchivo = (e) => {
     const file = e.target.files[0];
     setArchivo(file);
@@ -155,7 +159,6 @@ const LitisBotConVoz = () => {
       <h2 style={{ color: "#1662C4", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <span role="img" aria-label="chat">💬</span> Litis Chat
       </h2>
-      {/* SOLO el LOGO aquí */}
       <div style={{ textAlign: "center", margin: "0 0 12px 0" }}>
         <img
           src="/litisbot-logo.png"
@@ -163,7 +166,6 @@ const LitisBotConVoz = () => {
           style={{ width: 88, height: 88, borderRadius: 24, margin: "0 auto 12px auto", boxShadow: "0 2px 8px #ddd" }}
         />
       </div>
-      {/* Controles arriba */}
       <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 12 }}>
         <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <input type="checkbox" checked={microfonoActivo} onChange={toggleMicrofono} />
@@ -174,7 +176,6 @@ const LitisBotConVoz = () => {
           <span style={{ fontSize: 15, color: vozActiva ? "#1662C4" : "#888" }}>Voz</span>
         </label>
       </div>
-      {/* Botón microfono */}
       <div style={{ textAlign: "center", margin: "12px 0" }}>
         <button
           onClick={() => microfonoActivo && handleEscuchar()}
@@ -202,7 +203,6 @@ const LitisBotConVoz = () => {
           {estado}
         </div>
       </div>
-      {/* Input y adjunto */}
       <div style={{ margin: "10px 0", display: "flex", flexDirection: "column", gap: 8 }}>
         <input
           ref={inputRef}
@@ -237,7 +237,6 @@ const LitisBotConVoz = () => {
           Consultar
         </button>
       </div>
-      {/* Respuesta */}
       <div style={{
         margin: "22px 0", minHeight: 64, background: "#f8faff",
         borderRadius: 12, padding: 14, color: "#222", fontSize: 17
@@ -253,4 +252,3 @@ const LitisBotConVoz = () => {
 };
 
 export default LitisBotConVoz;
-
