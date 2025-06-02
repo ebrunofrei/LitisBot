@@ -1,305 +1,206 @@
-// src/pages/LitisBotConVoz.jsx
-import React, { useState, useEffect, useRef } from 'react';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
-import { saveAs } from 'file-saver';
+import React, { useState, useRef } from "react";
+import { db, auth } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 
-import VisualResponse from '../components/LitisBotConVoz/VisualResponse';
+// Utilidades para Speech API
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = SpeechRecognition ? new SpeechRecognition() : null;
 
-import { useUser } from '../hooks/useUser';
-import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
-import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
-import { useLanguageDetection } from '../hooks/useLanguageDetection';
+const synth = window.speechSynthesis;
 
-import { handleLegalResponse } from '../components/LitisBotConVoz/LegalResponseEngine';
-import { saveLegalSource } from '../database/legalSourceService';
-import { db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
-
-const VOICES = {
-  es: {
-    male: 'Google Español Male',
-    female: 'Google Español Female',
-  },
-  en: {
-    male: 'Google US English Male',
-    female: 'Google US English Female',
-  },
+const estados = {
+  INICIO: "Haz tu pregunta legal o toca el micrófono para hablar...",
+  ESCUCHANDO: "Escuchando... habla ahora.",
+  PROCESANDO: "Procesando tu consulta...",
+  RESPONDIENDO: "¡Aquí tienes la respuesta!"
 };
 
 const LitisBotConVoz = () => {
-  const { userId, userName, hasName, saveName } = useUser();
-  const [nameInput, setNameInput] = useState('');
-  const [input, setInput] = useState('');
-  const [responses, setResponses] = useState([]);
-  const [structuredResponses, setStructuredResponses] = useState([]);
+  const [user] = useAuthState(auth);
+  const [input, setInput] = useState("");
+  const [respuesta, setRespuesta] = useState("");
+  const [escuchando, setEscuchando] = useState(false);
+  const [estado, setEstado] = useState(estados.INICIO);
+  const [archivo, setArchivo] = useState(null);
+  const [cargandoArchivo, setCargandoArchivo] = useState(false);
 
-  const [modoJuicio, setModoJuicio] = useState(true);
-  const [encabezado, setEncabezado] = useState({ abogado: '', expediente: '', juzgado: '' });
-  const [materia, setMateria] = useState('general');
+  const inputRef = useRef(null);
 
-  const language = useLanguageDetection(input);
-
-  const [voiceGender, setVoiceGender] = useState('male');
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [speechRate, setSpeechRate] = useState(1);
-  const [speechVolume, setSpeechVolume] = useState(1);
-
-  const responsesEndRef = useRef(null);
-
-  const { listening, startListening } = useSpeechRecognition(
-    language === 'es' ? 'es-PE' : 'en-US',
-    (transcript) => {
-      setInput(transcript);
-      handleSubmit(transcript);
-    },
-    (error) => {
-      console.error(error);
+  // --- Función de reconocimiento de voz
+  const handleEscuchar = () => {
+    if (!recognition) {
+      alert("El reconocimiento de voz no está disponible en este navegador.");
+      return;
     }
-  );
+    setEscuchando(true);
+    setEstado(estados.ESCUCHANDO);
+    recognition.lang = "es-PE";
+    recognition.start();
 
-  const { isSpeaking, speak, pause, resume } = useSpeechSynthesis(language, voiceGender, speechRate, speechVolume);
-
-  useEffect(() => {
-    if (responsesEndRef.current) {
-      responsesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [responses]);
-
-  useEffect(() => {
-    if (hasName && responses.length === 0) {
-      const saludo = '¿Cómo te fue en este caso? ¿Hay algo más en lo que pueda ayudarte?';
-      setResponses([{ question: '', answer: saludo }]);
-      setStructuredResponses([{ texto: saludo }]);
-      if (voiceEnabled) speak(saludo);
-    }
-  }, [hasName]);
-
-  const handleSaveName = () => {
-    if (nameInput.trim() === '') return;
-    saveName(nameInput);
+    recognition.onresult = (event) => {
+      const texto = event.results[0][0].transcript;
+      setInput(texto);
+      setEscuchando(false);
+      setEstado(estados.PROCESANDO);
+      handleEnviar(texto);
+    };
+    recognition.onerror = () => {
+      setEscuchando(false);
+      setEstado(estados.INICIO);
+    };
+    recognition.onend = () => setEscuchando(false);
   };
 
-  const handleSubmit = async (text) => {
-    if (!text.trim()) return;
-    setInput('');
-
-    const pregunta = { question: text, answer: '' };
-    setResponses((prev) => [...prev, pregunta]);
-    setStructuredResponses((prev) => [...prev, null]);
-
-    const structuredRespuesta = await handleLegalResponse(text, {
-      tipoJuicio: modoJuicio ? 'penal' : 'consulta',
-      materia: materia,
-      registrarFuente: async (fuente) => {
-        await saveLegalSource(fuente);
-        await setDoc(doc(db, 'usuarios', userId, 'historialFuentes', fuente.cita), fuente);
-      },
-      userId: userId
-    });
-
-    if (structuredRespuesta.texto) speak(structuredRespuesta.texto, voiceEnabled);
-
-    setResponses((prev) => {
-      const updated = [...prev];
-      updated[updated.length - 1] = { question: text, answer: structuredRespuesta.texto || '...' };
-      return updated;
-    });
-
-    setStructuredResponses((prev) => {
-      const updated = [...prev];
-      updated[updated.length - 1] = structuredRespuesta;
-      return updated;
-    });
+  // --- Función para hablar la respuesta
+  const handleHablar = (texto) => {
+    if ("speechSynthesis" in window) {
+      const utter = new window.SpeechSynthesisUtterance(texto);
+      utter.lang = "es-PE";
+      synth.cancel(); // Cancela cualquier reproducción previa
+      synth.speak(utter);
+    }
   };
 
-  const downloadWord = async () => {
-    const doc = new Document({
-      sections: [{
-        properties: {},
-        children: [
-          new Paragraph({ text: 'Conversación con LitisBot', heading: HeadingLevel.TITLE }),
-          new Paragraph({ text: `Abogado: ${encabezado.abogado || '-'}` }),
-          new Paragraph({ text: `Expediente: ${encabezado.expediente || '-'}` }),
-          new Paragraph({ text: `Juzgado: ${encabezado.juzgado || '-'}` }),
-          new Paragraph({ text: `Materia: ${materia}` }),
-          new Paragraph({ text: '' }),
-          ...responses.flatMap((resp, i) => [
-            new Paragraph({ text: `Pregunta ${i + 1}:`, heading: HeadingLevel.HEADING_2 }),
-            new Paragraph({ children: [new TextRun({ text: resp.question, bold: true })] }),
-            new Paragraph({ text: `Respuesta:`, heading: HeadingLevel.HEADING_3 }),
-            new Paragraph({ children: [new TextRun({ text: resp.answer })] }),
-            new Paragraph({ text: '' }),
-          ]),
-        ],
-      }],
-    });
-
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, 'ConversacionLitisBot.docx');
+  // --- Simulación de respuesta avanzada de IA (puedes conectar a tu backend)
+  const obtenerRespuestaIA = async (pregunta, archivo = null) => {
+    if (archivo && pregunta.toLowerCase().includes("resumir")) {
+      return `Analicé el archivo y aquí tienes un resumen simulado. [Función real pendiente de backend]`;
+    }
+    if (pregunta.toLowerCase().includes("consejo")) {
+      return `Consejo jurídico: Ante cualquier duda, revisa la normativa nacional vigente y consulta con un abogado colegiado.`;
+    }
+    if (pregunta.toLowerCase().includes("buscar")) {
+      return `Funcionalidad de búsqueda avanzada disponible. Pronto se integrará consulta a la biblioteca legal y Google.`;
+    }
+    return `Tu consulta fue: "${pregunta}". [Respuesta generada por IA simulada].`;
   };
 
-  if (!hasName) {
-    return (
-      <div style={{ padding: 20, maxWidth: 400, margin: 'auto' }}>
-        <h2>Bienvenido a LitisBot</h2>
-        <p>Por favor, ingresa tu nombre para que pueda dirigirme a ti personalmente.</p>
-        <input
-          type="text"
-          value={nameInput}
-          onChange={e => setNameInput(e.target.value)}
-          placeholder="Tu nombre"
-          style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-        />
-        <button
-          onClick={handleSaveName}
-          disabled={nameInput.trim() === ''}
-          style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: 4 }}
-        >
-          Guardar nombre
-        </button>
-      </div>
-    );
-  }
+  // --- Enviar consulta
+  const handleEnviar = async (texto = null) => {
+    let pregunta = texto !== null ? texto : input;
+    if (!pregunta && !archivo) {
+      setEstado("Por favor, ingresa una pregunta o adjunta un archivo.");
+      return;
+    }
+    setEstado(estados.PROCESANDO);
+    setRespuesta("");
+
+    // Procesar adjunto
+    let resultadoArchivo = null;
+    if (archivo) {
+      setCargandoArchivo(true);
+      resultadoArchivo = archivo.name;
+      setCargandoArchivo(false);
+    }
+
+    // Llama a la "IA" (simulado aquí)
+    const respuestaBot = await obtenerRespuestaIA(pregunta, archivo);
+    setRespuesta(respuestaBot);
+    setEstado(estados.RESPONDIENDO);
+
+    // Guardar en Firebase (historial aprendizaje bot)
+    if (user) {
+      await addDoc(collection(db, "conversaciones"), {
+        pregunta,
+        respuesta: respuestaBot,
+        uid: user.uid,
+        nombre: user.displayName || user.email,
+        archivo: archivo ? archivo.name : null,
+        fecha: serverTimestamp(),
+      });
+    }
+
+    handleHablar(respuestaBot);
+    setArchivo(null);
+    setInput("");
+  };
+
+  // --- Adjuntar archivo
+  const handleArchivo = (e) => {
+    const file = e.target.files[0];
+    setArchivo(file);
+    setEstado(`Archivo "${file.name}" listo para analizar.`);
+  };
 
   return (
-    <div style={{ padding: 20, maxWidth: 700, margin: 'auto' }}>
-      <h1>LitisBot con Voz ({modoJuicio ? 'Modo Juicio' : 'Modo Consulta'})</h1>
-
-      <div>
-        <label>
-          <input type="checkbox" checked={modoJuicio} onChange={() => setModoJuicio(!modoJuicio)} />
-          &nbsp;Modo juicio activado
-        </label>
-
-        <label style={{ marginLeft: 20 }}>
-          Idioma detectado:&nbsp;<b>{language === 'es' ? 'Español' : 'Inglés'}</b>
-        </label>
-
-        <label style={{ marginLeft: 20 }}>
-          Voz:&nbsp;
-          <select value={voiceGender} onChange={e => setVoiceGender(e.target.value)}>
-            <option value="male">Masculina</option>
-            <option value="female">Femenina</option>
-          </select>
-        </label>
-
-        <label style={{ marginLeft: 20 }}>
-          <input
-            type="checkbox"
-            checked={voiceEnabled}
-            onChange={e => setVoiceEnabled(e.target.checked)}
-          />
-          Voz Activada
-        </label>
-      </div>
-
-      <div style={{ marginTop: 10 }}>
-        <label>
-          Velocidad de voz:&nbsp;
-          <input
-            type="range"
-            min="0.5"
-            max="2"
-            step="0.1"
-            value={speechRate}
-            onChange={e => setSpeechRate(parseFloat(e.target.value))}
-          />
-          {speechRate}
-        </label>
-
-        <label style={{ marginLeft: 20 }}>
-          Volumen:&nbsp;
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            value={speechVolume}
-            onChange={e => setSpeechVolume(parseFloat(e.target.value))}
-          />
-          {speechVolume}
-        </label>
-      </div>
-
-      <div style={{ marginTop: 10 }}>
-        <label>Abogado:&nbsp;<input value={encabezado.abogado} onChange={e => setEncabezado({ ...encabezado, abogado: e.target.value })} /></label>
-        <label style={{ marginLeft: 10 }}>Expediente:&nbsp;<input value={encabezado.expediente} onChange={e => setEncabezado({ ...encabezado, expediente: e.target.value })} /></label>
-        <label style={{ marginLeft: 10 }}>Juzgado:&nbsp;<input value={encabezado.juzgado} onChange={e => setEncabezado({ ...encabezado, juzgado: e.target.value })} /></label>
-        <label style={{ marginLeft: 10 }}>Materia:&nbsp;
-          <select value={materia} onChange={e => setMateria(e.target.value)}>
-            <option value="general">General</option>
-            <option value="civil">Civil</option>
-            <option value="penal">Penal</option>
-            <option value="constitucional">Constitucional</option>
-            <option value="administrativo">Administrativo</option>
-            <option value="laboral">Laboral</option>
-            <option value="familia">Familia</option>
-          </select>
-        </label>
-      </div>
-
-      <button onClick={startListening} disabled={listening} style={{ marginTop: 10 }}>
-        {listening ? 'Escuchando...' : 'Iniciar grabación'}
-      </button>
-
-      <br />
-
-      <input
-        type="text"
-        placeholder="Escribe o usa voz para preguntar"
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter' && input.trim() !== '') {
-            handleSubmit(input);
-          }
-        }}
-        style={{ width: '80%', padding: '8px', marginTop: '10px' }}
-      />
-      <button
-        onClick={() => handleSubmit(input)}
-        disabled={input.trim() === ''}
-        style={{ marginLeft: 10 }}
-      >
-        Enviar
-      </button>
-
-      <div
-        style={{
-          marginTop: 20,
-          maxHeight: 300,
-          overflowY: 'auto',
-          border: '1px solid #ccc',
-          padding: 10,
-          borderRadius: 4,
-        }}
-      >
-        {responses.map((resp, idx) => (
-          <div key={idx} style={{ marginBottom: 15 }}>
-            <strong>Pregunta:</strong> {resp.question}<br />
-            <strong>Respuesta:</strong>
-            <VisualResponse respuesta={structuredResponses[idx]} />
-            <hr />
-          </div>
-        ))}
-        <div ref={responsesEndRef} />
-      </div>
-
-      {isSpeaking ? (
-        <button onClick={pause} style={{ marginTop: 10 }}>
-          Pausar lectura
+    <div className="litisbotvoz-container" style={{ maxWidth: 520, margin: "0 auto", padding: 24 }}>
+      <h2 style={{ color: "#1662C4", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+        <span role="img" aria-label="chat">💬</span> Litis Chat
+      </h2>
+      <div style={{ textAlign: "center", margin: "12px 0" }}>
+        <button
+          onClick={handleEscuchar}
+          disabled={escuchando}
+          style={{
+            background: escuchando ? "#ffbd2f" : "#1662C4",
+            border: "none",
+            borderRadius: "50%",
+            width: 64,
+            height: 64,
+            marginBottom: 8,
+            color: "#fff",
+            fontSize: 32,
+            boxShadow: escuchando ? "0 0 12px #ffbd2f" : "0 2px 6px #aaa",
+            transition: "0.2s"
+          }}
+          title="Presiona y habla tu consulta"
+        >
+          <span role="img" aria-label="microfono">
+            {escuchando ? "🎤" : "🗣️"}
+          </span>
         </button>
-      ) : (
-        <button onClick={resume} style={{ marginTop: 10 }} disabled={!isSpeaking}>
-          Reanudar lectura
+        <div style={{ marginTop: 4, color: escuchando ? "#ffbd2f" : "#1662C4", fontWeight: "bold" }}>
+          {estado}
+        </div>
+      </div>
+      <div style={{ margin: "10px 0", display: "flex", flexDirection: "column", gap: 8 }}>
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          disabled={escuchando}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && handleEnviar()}
+          placeholder="O escribe tu consulta legal aquí…"
+          style={{
+            width: "100%", fontSize: 17, padding: 9, borderRadius: 8,
+            border: "1px solid #1662C4", outline: "none"
+          }}
+        />
+        <div>
+          <label style={{ cursor: "pointer", color: "#1662C4" }}>
+            📎 Adjuntar archivo
+            <input type="file" accept=".pdf,.doc,.docx,.txt,.jpg,.png" style={{ display: "none" }} onChange={handleArchivo} />
+          </label>
+          {archivo && (
+            <span style={{ marginLeft: 8, color: "#333" }}>Archivo: <b>{archivo.name}</b></span>
+          )}
+        </div>
+        <button
+          onClick={() => handleEnviar()}
+          style={{
+            background: "#1662C4", color: "#fff", padding: "8px 18px",
+            border: "none", borderRadius: 8, marginTop: 4, fontWeight: "bold"
+          }}
+          disabled={escuchando || cargandoArchivo}
+        >
+          Consultar
         </button>
-      )}
-
-      <hr style={{ marginTop: 20, marginBottom: 20 }} />
-
-      <button onClick={downloadWord}>Descargar conversación en Word</button>
+      </div>
+      <div style={{
+        margin: "22px 0", minHeight: 64, background: "#f8faff",
+        borderRadius: 12, padding: 14, color: "#222", fontSize: 17
+      }}>
+        <b>Respuesta:</b><br />
+        {respuesta || <span style={{ color: "#aaa" }}>La respuesta aparecerá aquí.</span>}
+      </div>
+      <div style={{ fontSize: 13, color: "#888", marginTop: 16, textAlign: "center" }}>
+        <b>Litis Chat</b> nunca te dará consejos legales irresponsables ni inventará normas. Toda respuesta es orientativa.
+      </div>
     </div>
   );
 };
 
 export default LitisBotConVoz;
+
