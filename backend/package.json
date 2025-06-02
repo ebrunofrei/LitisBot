@@ -12,6 +12,6 @@
     "express-rate-limit": "^7.0.0",
     "firebase-admin": "^13.4.0",
     "mongoose": "^8.2.2",
-    "openai": "^4.32.1"
+    "openai": "^5.0.1"
   }
 }
