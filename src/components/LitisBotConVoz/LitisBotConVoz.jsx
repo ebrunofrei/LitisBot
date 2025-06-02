@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { db, auth } from "../../firebase"; // Asegúrate que esta ruta es correcta
+import { db, auth } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
@@ -110,7 +110,6 @@ const LitisBotConVoz = () => {
 
     if (archivo) {
       setCargandoArchivo(true);
-      // Procesamiento futuro del archivo
       setCargandoArchivo(false);
     }
 
@@ -153,6 +152,20 @@ const LitisBotConVoz = () => {
         <span role="img" aria-label="chat">💬</span> Litis Chat
       </h2>
 
+      <div style={{ textAlign: "center", margin: "0 0 12px 0" }}>
+        <img
+          src="/litisbot-logo.png"
+          alt="LitisBot Logo"
+          style={{
+            width: 88,
+            height: 88,
+            borderRadius: 24,
+            margin: "0 auto 12px auto",
+            boxShadow: "0 2px 8px #ddd"
+          }}
+        />
+      </div>
+
       <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 12 }}>
         <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <input type="checkbox" checked={microfonoActivo} onChange={toggleMicrofono} />
@@ -168,32 +181,8 @@ const LitisBotConVoz = () => {
         </label>
       </div>
 
-      <div style={{ textAlign: "center", margin: "12px 0" }}>
-        <button
-          onClick={() => microfonoActivo && handleEscuchar()}
-          disabled={escuchando || !microfonoActivo}
-          style={{
-            background: escuchando ? "#ffbd2f" : "#1662C4",
-            border: "none",
-            borderRadius: "50%",
-            width: 64,
-            height: 64,
-            marginBottom: 8,
-            color: "#fff",
-            fontSize: 32,
-            boxShadow: escuchando ? "0 0 12px #ffbd2f" : "0 2px 6px #aaa",
-            opacity: microfonoActivo ? 1 : 0.4,
-            transition: "0.2s"
-          }}
-          title={microfonoActivo ? "Presiona y habla tu consulta" : "Micrófono desactivado"}
-        >
-          <span role="img" aria-label="microfono">
-            {escuchando ? "🎤" : "🗣️"}
-          </span>
-        </button>
-        <div style={{ marginTop: 4, color: escuchando ? "#ffbd2f" : "#1662C4", fontWeight: "bold" }}>
-          {estado}
-        </div>
+      <div style={{ margin: "12px 0", textAlign: "center", fontWeight: "bold", color: escuchando ? "#ffbd2f" : "#1662C4" }}>
+        {estado}
       </div>
 
       <div style={{ margin: "10px 0", display: "flex", flexDirection: "column", gap: 8 }}>
