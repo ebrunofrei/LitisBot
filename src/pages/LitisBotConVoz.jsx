@@ -155,6 +155,7 @@ const LitisBotConVoz = () => {
       <h2 style={{ color: "#1662C4", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <span role="img" aria-label="chat">💬</span> Litis Chat
       </h2>
+      {/* SOLO el LOGO aquí */}
       <div style={{ textAlign: "center", margin: "0 0 12px 0" }}>
         <img
           src="/litisbot-logo.png"
@@ -162,6 +163,7 @@ const LitisBotConVoz = () => {
           style={{ width: 88, height: 88, borderRadius: 24, margin: "0 auto 12px auto", boxShadow: "0 2px 8px #ddd" }}
         />
       </div>
+      {/* Controles arriba */}
       <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 12 }}>
         <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <input type="checkbox" checked={microfonoActivo} onChange={toggleMicrofono} />
@@ -172,6 +174,7 @@ const LitisBotConVoz = () => {
           <span style={{ fontSize: 15, color: vozActiva ? "#1662C4" : "#888" }}>Voz</span>
         </label>
       </div>
+      {/* Botón microfono */}
       <div style={{ textAlign: "center", margin: "12px 0" }}>
         <button
           onClick={() => microfonoActivo && handleEscuchar()}
@@ -199,6 +202,7 @@ const LitisBotConVoz = () => {
           {estado}
         </div>
       </div>
+      {/* Input y adjunto */}
       <div style={{ margin: "10px 0", display: "flex", flexDirection: "column", gap: 8 }}>
         <input
           ref={inputRef}
@@ -233,6 +237,7 @@ const LitisBotConVoz = () => {
           Consultar
         </button>
       </div>
+      {/* Respuesta */}
       <div style={{
         margin: "22px 0", minHeight: 64, background: "#f8faff",
         borderRadius: 12, padding: 14, color: "#222", fontSize: 17
