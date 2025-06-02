@@ -3,10 +3,8 @@ import { db, auth } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
-// Utilidades para Speech API
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = SpeechRecognition ? new SpeechRecognition() : null;
-
 const synth = window.speechSynthesis;
 
 const estados = {
@@ -15,6 +13,24 @@ const estados = {
   PROCESANDO: "Procesando tu consulta...",
   RESPONDIENDO: "¡Aquí tienes la respuesta!"
 };
+
+// Base de conceptos y respuestas reales
+const conceptosBase = {
+  "derecho administrativo": "El Derecho Administrativo es la rama del Derecho Público que regula la organización, el funcionamiento y la actividad de la Administración Pública, así como las relaciones entre esta y los ciudadanos.",
+  "derecho civil": "El Derecho Civil es la rama del Derecho que regula las relaciones privadas entre las personas, tales como contratos, familia, propiedad y sucesiones.",
+  "nulidad de acto jurídico": "La nulidad de acto jurídico es la sanción que deja sin efecto un acto celebrado en contravención de normas imperativas o por falta de elementos esenciales, considerándolo inexistente o inválido desde su origen.",
+  // Agrega más conceptos y respuestas frecuentes aquí...
+};
+
+function obtenerConcepto(pregunta) {
+  const texto = pregunta.toLowerCase();
+  for (let clave in conceptosBase) {
+    if (texto.includes(clave)) {
+      return conceptosBase[clave];
+    }
+  }
+  return null;
+}
 
 const LitisBotConVoz = () => {
   const [user] = useAuthState(auth);
@@ -25,9 +41,16 @@ const LitisBotConVoz = () => {
   const [archivo, setArchivo] = useState(null);
   const [cargandoArchivo, setCargandoArchivo] = useState(false);
 
+  const [microfonoActivo, setMicrofonoActivo] = useState(true);
+  const [vozActiva, setVozActiva] = useState(true);
+
   const inputRef = useRef(null);
 
-  // --- Función de reconocimiento de voz
+  // Activar/desactivar microfono y voz
+  const toggleMicrofono = () => setMicrofonoActivo((v) => !v);
+  const toggleVoz = () => setVozActiva((v) => !v);
+
+  // --- Reconocimiento de voz
   const handleEscuchar = () => {
     if (!recognition) {
       alert("El reconocimiento de voz no está disponible en este navegador.");
@@ -52,18 +75,23 @@ const LitisBotConVoz = () => {
     recognition.onend = () => setEscuchando(false);
   };
 
-  // --- Función para hablar la respuesta
+  // --- Voz (Text-to-Speech)
   const handleHablar = (texto) => {
-    if ("speechSynthesis" in window) {
+    if (vozActiva && "speechSynthesis" in window) {
       const utter = new window.SpeechSynthesisUtterance(texto);
       utter.lang = "es-PE";
-      synth.cancel(); // Cancela cualquier reproducción previa
+      synth.cancel();
       synth.speak(utter);
     }
   };
 
-  // --- Simulación de respuesta avanzada de IA (puedes conectar a tu backend)
+  // --- Respuesta mejorada
   const obtenerRespuestaIA = async (pregunta, archivo = null) => {
+    // 1. Buscar concepto jurídico conocido
+    const concepto = obtenerConcepto(pregunta);
+    if (concepto) return concepto;
+
+    // 2. Resto de respuestas
     if (archivo && pregunta.toLowerCase().includes("resumir")) {
       return `Analicé el archivo y aquí tienes un resumen simulado. [Función real pendiente de backend]`;
     }
@@ -73,7 +101,7 @@ const LitisBotConVoz = () => {
     if (pregunta.toLowerCase().includes("buscar")) {
       return `Funcionalidad de búsqueda avanzada disponible. Pronto se integrará consulta a la biblioteca legal y Google.`;
     }
-    return `Tu consulta fue: "${pregunta}". [Respuesta generada por IA simulada].`;
+    return `Lo siento, mi base de conocimientos aún está en desarrollo para consultas muy específicas. ¿Deseas que busque información adicional o deseas consultar otro tema?`;
   };
 
   // --- Enviar consulta
@@ -87,14 +115,13 @@ const LitisBotConVoz = () => {
     setRespuesta("");
 
     // Procesar adjunto
-    let resultadoArchivo = null;
     if (archivo) {
       setCargandoArchivo(true);
-      resultadoArchivo = archivo.name;
+      // Aquí iría la lógica real de análisis de archivo
       setCargandoArchivo(false);
     }
 
-    // Llama a la "IA" (simulado aquí)
+    // Respuesta avanzada
     const respuestaBot = await obtenerRespuestaIA(pregunta, archivo);
     setRespuesta(respuestaBot);
     setEstado(estados.RESPONDIENDO);
@@ -128,10 +155,27 @@ const LitisBotConVoz = () => {
       <h2 style={{ color: "#1662C4", textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <span role="img" aria-label="chat">💬</span> Litis Chat
       </h2>
+      <div style={{ textAlign: "center", margin: "0 0 12px 0" }}>
+        <img
+          src="/litisbot-logo.png"
+          alt="LitisBot Logo"
+          style={{ width: 88, height: 88, borderRadius: 24, margin: "0 auto 12px auto", boxShadow: "0 2px 8px #ddd" }}
+        />
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: 12 }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <input type="checkbox" checked={microfonoActivo} onChange={toggleMicrofono} />
+          <span style={{ fontSize: 15, color: microfonoActivo ? "#1662C4" : "#888" }}>Micrófono</span>
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <input type="checkbox" checked={vozActiva} onChange={toggleVoz} />
+          <span style={{ fontSize: 15, color: vozActiva ? "#1662C4" : "#888" }}>Voz</span>
+        </label>
+      </div>
       <div style={{ textAlign: "center", margin: "12px 0" }}>
         <button
-          onClick={handleEscuchar}
-          disabled={escuchando}
+          onClick={() => microfonoActivo && handleEscuchar()}
+          disabled={escuchando || !microfonoActivo}
           style={{
             background: escuchando ? "#ffbd2f" : "#1662C4",
             border: "none",
@@ -142,9 +186,10 @@ const LitisBotConVoz = () => {
             color: "#fff",
             fontSize: 32,
             boxShadow: escuchando ? "0 0 12px #ffbd2f" : "0 2px 6px #aaa",
+            opacity: microfonoActivo ? 1 : 0.4,
             transition: "0.2s"
           }}
-          title="Presiona y habla tu consulta"
+          title={microfonoActivo ? "Presiona y habla tu consulta" : "Micrófono desactivado"}
         >
           <span role="img" aria-label="microfono">
             {escuchando ? "🎤" : "🗣️"}
