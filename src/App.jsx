@@ -2,11 +2,10 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import InstalarApp from "./components/InstalarApp";
-import LitisBotConVoz from './components/LitisBotConVoz/LitisBotConVoz';
 
 // Importa tus páginas desde /pages/
 import Bienvenida from "./pages/Bienvenida";
-import LitisBotConVoz from './components/LitisBotConVoz/LitisBotConVoz';
+import LitisBotConVoz from './components/LitisBotConVoz/LitisBotConVoz.jsx'; // con extensión
 import LitisBotOCR from "./pages/LitisBotOCR";
 import BusquedaAvanzada from "./pages/BusquedaAvanzada";
 import Agenda from "./pages/Agenda";
