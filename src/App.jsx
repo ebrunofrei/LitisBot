@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import InstalarApp from "./components/InstalarApp";
+import LitisBotConVoz from './components/LitisBotConVoz/LitisBotConVoz';
 
 // Importa tus páginas desde /pages/
 import Bienvenida from "./pages/Bienvenida";
