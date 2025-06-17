@@ -1,21 +1,26 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Navbar() {
+export default function Navbar() {
   return (
-    <nav style={{ background: "#2563eb", padding: "10px" }}>
-      <Link to="/" style={{ color: "#fff", fontWeight: "bold", marginRight: 20 }}>Inicio</Link>
-      <Link to="/litisbotconvoz" style={{ color: "#fff", marginRight: 10 }}>LitisBot con Voz</Link>
-      <Link to="/litisbotocr" style={{ color: "#fff", marginRight: 10 }}>LitisBot OCR</Link>
-      <Link to="/busqueda-avanzada" style={{ color: "#fff", marginRight: 10 }}>Búsqueda Avanzada</Link>
-      <Link to="/agenda" style={{ color: "#fff", marginRight: 10 }}>Agenda</Link>
-      <Link to="/clientes" style={{ color: "#fff", marginRight: 10 }}>Clientes</Link>
-      <Link to="/biblioteca" style={{ color: "#fff", marginRight: 10 }}>Biblioteca</Link>
-      <Link to="/jurisprudencia" style={{ color: "#fff", marginRight: 10 }}>Jurisprudencia</Link>
-      <Link to="/tips" style={{ color: "#fff", marginRight: 10 }}>Tips</Link>
-      <Link to="/buscadorgoogle" style={{ color: "#fff", marginRight: 10 }}>Buscador Google</Link>
+    <nav style={{
+      background: "#1976d2",
+      color: "#fff",
+      padding: "9px 0",
+      display: "flex",
+      alignItems: "center"
+    }}>
+      <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none", color: "#fff", fontWeight: "bold", fontSize: 28, marginLeft: 14 }}>
+        {/* Asegúrate que el logo existe y la ruta es correcta */}
+        <img
+          src="/logo.svg"      // o "/web-app-manifest-192x192.png" o el PNG cuadrado que generaste
+          alt="LitisBot"
+          style={{ height: 38, marginRight: 12, borderRadius: 10, background: "#fff" }}
+          onError={e => { e.target.onerror = null; e.target.src="/web-app-manifest-192x192.png"; }}
+        />
+        LitisBot
+      </Link>
+      {/* ...aquí puedes agregar el menú... */}
     </nav>
   );
 }
-
-export default Navbar;
