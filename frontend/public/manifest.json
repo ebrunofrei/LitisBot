@@ -1,7 +1,7 @@
 {
   "short_name": "LitisBot",
-  "name": "LitisBot - Asistente Legal en Tiempo Real",
-  "description": "Asistente legal, biblioteca, modelos y soporte jurídico 24/7 en el Perú.",
+  "name": "LitisBot - Asistente Legal, Biblioteca y Modelos Jurídicos",
+  "description": "Porque la justicia no debe ser un privilegio de algunos: estoy a tu servicio.",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -12,14 +12,46 @@
       "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/favicon-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-24x24.png",
+      "sizes": "24x24",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
     }
   ],
   "start_url": ".",
-  "scope": ".",
   "display": "standalone",
-  "background_color": "#1662C4",
-  "theme_color": "#1662C4",
-  "orientation": "portrait"
+  "background_color": "#1976d2",
+  "theme_color": "#1976d2",
+  "orientation": "portrait",
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "1280x720",
+      "type": "image/png"
+    }
+  ]
 }
+
 
  
