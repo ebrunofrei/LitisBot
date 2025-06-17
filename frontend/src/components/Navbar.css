@@ -1,62 +1,42 @@
-/* src/components/Navbar.css */
-.navbar {
-  background-color: #007bff;
-  padding: 10px 20px;
-  color: white;
+import React from "react";
+import { Link } from "react-router-dom";
+
+export default function Navbar() {
+  return (
+    <nav style={{
+      background: "#1976d2",
+      color: "#fff",
+      padding: "9px 0",
+      display: "flex",
+      alignItems: "center"
+    }}>
+      <Link
+        to="/"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          textDecoration: "none",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: 28,
+          marginLeft: 14
+        }}
+      >
+        <img
+          src="/litisbot-logo.png"
+          alt="LitisBot"
+          style={{
+            height: 38,
+            marginRight: 12,
+            borderRadius: 10,
+            background: "#fff"
+          }}
+          onError={e => { e.target.onerror = null; e.target.src = "/favicon-32x32.png"; }}
+        />
+        LitisBot
+      </Link>
+    </nav>
+  );
 }
 
-.navbar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
-.navbar-brand {
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
-}
-
-.menu-toggle {
-  font-size: 24px;
-  background: none;
-  border: none;
-  color: white;
-  cursor: pointer;
-  display: none;
-}
-
-.nav-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.nav-links a {
-  color: white;
-  text-decoration: none;
-}
-
-@media (max-width: 768px) {
-  .menu-toggle {
-    display: block;
-  }
-
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    background-color: #007bff;
-    margin-top: 10px;
-    padding: 10px 0;
-  }
-
-  .nav-links.active {
-    display: flex;
-  }
-
-  .nav-links a {
-    padding: 8px 20px;
-  }
-}
