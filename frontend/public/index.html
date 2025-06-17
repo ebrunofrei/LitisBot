@@ -2,18 +2,30 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1976d2" />
-    <meta
-      name="description"
-      content="LitisBot: Asistente Legal, biblioteca, modelos de escritos y soporte jurídico en tiempo real."
-    />
-    <!-- Iconos para dispositivos -->
-    <link rel="apple-touch-icon" href="/android-chrome-192x192.png" />
+
+    <!-- Color principal, igual que tu manifest.json -->
+    <meta name="theme-color" content="#1662C4" />
+
+    <meta name="description" content="LitisBot: Asistente Legal, biblioteca, modelos de escritos y soporte jurídico en tiempo real." />
+
+    <!-- Favicon clásico -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+
+    <!-- Icono principal PWA y Apple Touch -->
+    <link rel="apple-touch-icon" sizes="192x192" href="/android-chrome-192x192.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/android-chrome-512x512.png" />
+    <!-- Icono propio si lo prefieres -->
+    <!-- <link rel="apple-touch-icon" href="/litisbot-logo.png" /> -->
+
+    <!-- Manifest PWA -->
     <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" href="/logo-litisbot-192.png" />
-    <meta name="theme-color" content="#2563eb" />
+
+    <meta name="apple-mobile-web-app-title" content="LitisBot" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 
     <title>LitisBot</title>
   </head>
@@ -22,8 +34,7 @@
     <div id="root"></div>
     <!--
       Este archivo HTML es una plantilla.
-      Si la abres directamente en el navegador, verás una página vacía.
-      El build step pondrá los scripts compilados en esta etiqueta.
+      El build step pondrá los scripts compilados aquí.
     -->
   </body>
 </html>

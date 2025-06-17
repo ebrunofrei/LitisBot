@@ -1,42 +1,44 @@
-import React from "react";
-import { Link } from "react-router-dom";
+.navbar {
+  background: #1662C4;       /* Color institucional (igual que manifest) */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 8px 0 8px 0;
+  min-height: 56px;
+  box-shadow: 0 2px 8px #1643c435;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-export default function Navbar() {
-  return (
-    <nav style={{
-      background: "#1976d2",
-      color: "#fff",
-      padding: "9px 0",
-      display: "flex",
-      alignItems: "center"
-    }}>
-      <Link
-        to="/"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          textDecoration: "none",
-          color: "#fff",
-          fontWeight: "bold",
-          fontSize: 28,
-          marginLeft: 14
-        }}
-      >
-        <img
-          src="/litisbot-logo.png"
-          alt="LitisBot"
-          style={{
-            height: 38,
-            marginRight: 12,
-            borderRadius: 10,
-            background: "#fff"
-          }}
-          onError={e => { e.target.onerror = null; e.target.src = "/favicon-32x32.png"; }}
-        />
-        LitisBot
-      </Link>
-    </nav>
-  );
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 28px;
+  margin-left: 14px;
+}
+
+.navbar-logo img {
+  height: 40px;
+  width: auto;
+  margin-right: 10px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 8px #1643c420;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  .navbar-logo {
+    font-size: 22px;
+  }
+  .navbar-logo img {
+    height: 32px;
+    margin-right: 6px;
+  }
 }
 
 
