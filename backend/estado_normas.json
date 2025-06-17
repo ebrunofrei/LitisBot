@@ -1,0 +1,20 @@
+[
+  {
+    "codigo": "Código Civil",
+    "articulo": "219",
+    "estado": "vigente",
+    "vigencia": "1984-11-24"
+  },
+  {
+    "codigo": "TUO Ley N.º 27444",
+    "articulo": "VI T.P.",
+    "estado": "pendiente reglamentación",
+    "vigencia": "2025-07-01"
+  },
+  {
+    "codigo": "Código Procesal Civil",
+    "articulo": "85",
+    "estado": "vigente",
+    "vigencia": "1993-04-28"
+  }
+]

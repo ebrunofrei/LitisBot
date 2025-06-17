@@ -1,0 +1,25 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node ia.js"
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.0.0",
+    "firebase-admin": "^13.4.0",
+    "mongoose": "^8.2.2",
+    "openai": "^5.5.0",
+    "pdf2pic": "^3.2.0",
+    "tesseract.js": "^6.0.1"
+  },
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
